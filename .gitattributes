@@ -26,6 +26,11 @@
 *.sh eol=lf
 *.bat eol=lf
 *.ipynb eol=lf
+*.go eol=lf
+
+# go config
+go.mod eol=lf
+go.sum eol=lf
 
 # templates
 *.ejs eol=lf
