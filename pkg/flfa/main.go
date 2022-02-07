@@ -21,7 +21,7 @@ func main() {
 	startingState := dfa.State("q0")
 	acceptingStates := []dfa.State{"q1"}
 
-	dfa, err := dfa.New(states, alphabet, delta, startingState, acceptingStates)
+	dfa, err := dfa.NewDFA(states, alphabet, delta, startingState, acceptingStates)
 	if err != nil {
 		fmt.Print(err)
 		return
