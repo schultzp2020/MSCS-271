@@ -33,5 +33,5 @@ func main() {
 		return
 	}
 
-	fmt.Printf("Final State: %v\nIs Accepted: %v", finalState, isAccepted)
+	fmt.Printf("Final State: %v\nIs Accepted: %v\n", finalState, isAccepted)
 }

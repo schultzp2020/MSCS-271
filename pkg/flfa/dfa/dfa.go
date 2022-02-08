@@ -159,7 +159,7 @@ func (dfa *dfa) ValidateSymbol(symbol Symbol) error {
 		}
 	}
 
-	return fmt.Errorf("the symbol '%v' is not within the alphabet", symbol)
+	return fmt.Errorf("the symbol '%v' is not within the alphabet", string(symbol))
 }
 
 /*
