@@ -134,7 +134,7 @@ func TestNewDFA(t *testing.T) {
 		assert.Equal(t, tt.want, err)
 
 		if err != nil {
-			emptyDFA := InitializeDFA()
+			emptyDFA := initializeDFA()
 			assert.Equal(t, emptyDFA, dfa)
 		} else {
 			assert.Equal(t, tt.dfa, dfa)
@@ -189,7 +189,7 @@ func TestDFASolve(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		err := tt.dfa.Validate()
+		err := tt.dfa.validate()
 		assert.Equal(t, nil, err)
 
 		for _, dfaSolve := range tt.want {

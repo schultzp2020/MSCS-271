@@ -23,7 +23,7 @@ type dfa struct {
 /*
   Creates an empty DFA.
 */
-func InitializeDFA() dfa {
+func initializeDFA() dfa {
 	return dfa{
 		[]State([]State(nil)),
 		[]Symbol([]Symbol(nil)),
@@ -40,9 +40,9 @@ func InitializeDFA() dfa {
 func NewDFA(states []State, alphabet []Symbol, delta Delta, startingState State, acceptingStates []State) (dfa, error) {
 	dfa := dfa{states, alphabet, delta, startingState, acceptingStates}
 
-	err := dfa.Validate()
+	err := dfa.validate()
 	if err != nil {
-		emptyDFA := InitializeDFA()
+		emptyDFA := initializeDFA()
 		return emptyDFA, err
 	}
 
@@ -55,7 +55,7 @@ func NewDFA(states []State, alphabet []Symbol, delta Delta, startingState State,
 	If the given string contains a symbol not in the language, then the current state and false is returned.
 */
 func (dfa *dfa) Solve(str string) (State, bool, error) {
-	err := dfa.Validate()
+	err := dfa.validate()
 	if err != nil {
 		return "", false, err
 	}
@@ -63,7 +63,7 @@ func (dfa *dfa) Solve(str string) (State, bool, error) {
 	state := dfa.startingState
 
 	for _, symbol := range str {
-		err := dfa.ValidateSymbol(Symbol(symbol))
+		err := dfa.validateSymbol(Symbol(symbol))
 		if err != nil {
 			return state, false, err
 		}
@@ -71,7 +71,7 @@ func (dfa *dfa) Solve(str string) (State, bool, error) {
 		state = dfa.delta[state][Symbol(symbol)]
 	}
 
-	ok := dfa.IsStateAccepting(state)
+	ok := dfa.isStateAccepting(state)
 
 	return state, ok, nil
 }
@@ -79,18 +79,18 @@ func (dfa *dfa) Solve(str string) (State, bool, error) {
 /*
 	Validates the entire DFA.
 */
-func (dfa *dfa) Validate() error {
-	err := dfa.ValidateDelta()
+func (dfa *dfa) validate() error {
+	err := dfa.validateDelta()
 	if err != nil {
 		return err
 	}
 
-	err = dfa.ValidateStartingState()
+	err = dfa.validateStartingState()
 	if err != nil {
 		return err
 	}
 
-	err = dfa.ValidateAcceptingStates()
+	err = dfa.validateAcceptingStates()
 	if err != nil {
 		return err
 	}
@@ -101,7 +101,7 @@ func (dfa *dfa) Validate() error {
 /*
 	Validates the DFA's delta.
 */
-func (dfa *dfa) ValidateDelta() error {
+func (dfa *dfa) validateDelta() error {
 	// The last error catches if delta has less states and pinpoints it
 	if len(dfa.delta) > len(dfa.states) {
 		return fmt.Errorf("delta contains too many states")
@@ -134,7 +134,7 @@ func (dfa *dfa) ValidateDelta() error {
 /*
 	Validates the DFA's starting state.
 */
-func (dfa *dfa) ValidateStartingState() error {
+func (dfa *dfa) validateStartingState() error {
 	err := checkStateInStates(dfa.states, dfa.startingState, args{str: "starting"})
 
 	return err
@@ -143,7 +143,7 @@ func (dfa *dfa) ValidateStartingState() error {
 /*
 	Validates the DFA's accepting states.
 */
-func (dfa *dfa) ValidateAcceptingStates() error {
+func (dfa *dfa) validateAcceptingStates() error {
 	err := checkStatesInStates(dfa.states, dfa.acceptingStates, args{str: "accepting"})
 
 	return err
@@ -152,7 +152,7 @@ func (dfa *dfa) ValidateAcceptingStates() error {
 /*
 	Validates a given symbol against the DFA's alphabet.
 */
-func (dfa *dfa) ValidateSymbol(symbol Symbol) error {
+func (dfa *dfa) validateSymbol(symbol Symbol) error {
 	for _, acceptedSymbol := range dfa.alphabet {
 		if acceptedSymbol == symbol {
 			return nil
@@ -165,7 +165,7 @@ func (dfa *dfa) ValidateSymbol(symbol Symbol) error {
 /*
 	Checks if a state is an accepting state.
 */
-func (dfa *dfa) IsStateAccepting(state State) bool {
+func (dfa *dfa) isStateAccepting(state State) bool {
 	err := checkStateInStates(dfa.acceptingStates, state, args{})
 
 	return err == nil
