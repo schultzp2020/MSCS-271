@@ -1,37 +1,32 @@
 package main
 
 import (
-	"flfa/dfa"
+	"flfa/nfa"
 	"fmt"
 )
 
 func main() {
-	states := []dfa.State{"q0", "q1"}
-	alphabet := []dfa.Symbol{'a', 'b'}
-	delta := dfa.Delta{
+	states := []nfa.State{"q0", "q1"}
+	alphabet := []nfa.Symbol{'0', '1'}
+	delta := nfa.Delta{
 		"q0": {
-			'a': "q1",
-			'b': "q1",
+			'0': 0b01,
+			'1': 0b10,
 		},
 		"q1": {
-			'a': "q1",
-			'b': "q1",
+			'0': 0b01,
+			'1': 0b10,
 		},
 	}
-	startingState := dfa.State("q0")
-	acceptingStates := []dfa.State{"q1"}
+	startingStates := nfa.StatesBitMap(0b01)
+	acceptingStates := nfa.StatesBitMap(0b10)
 
-	dfa, err := dfa.NewDFA(states, alphabet, delta, startingState, acceptingStates)
+	nfa, err := nfa.NewNFA(states, alphabet, delta, startingStates, acceptingStates)
 	if err != nil {
 		fmt.Print(err)
-		return
 	}
 
-	finalState, isAccepted, err := dfa.Solve("b")
-	if err != nil {
-		fmt.Print(err)
-		return
-	}
+	finalStates, _, _ := nfa.Solve("111")
 
-	fmt.Printf("Final State: %v\nIs Accepted: %v\n", finalState, isAccepted)
+	fmt.Printf("%b", finalStates)
 }
