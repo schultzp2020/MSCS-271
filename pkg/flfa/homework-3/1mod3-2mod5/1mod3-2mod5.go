@@ -54,6 +54,7 @@ func main() {
 		fmt.Print(err)
 		return
 	}
+
 	var str string
 
 	fmt.Print("What is your binary string? ")
