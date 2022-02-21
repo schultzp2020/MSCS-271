@@ -26,7 +26,7 @@ func main() {
 		fmt.Print(err)
 	}
 
-	finalStates, _, _ := nfa.Solve("111")
+	finalStates, isAccepting, _ := nfa.Solve("1110")
 
-	fmt.Printf("%b", finalStates)
+	fmt.Printf("%b, %v", finalStates, isAccepting)
 }
