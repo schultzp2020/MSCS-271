@@ -18,7 +18,7 @@ func main() {
 			'1': 0b000010111,
 		},
 		"q2": {
-			'0': 0b000011010,
+			'0': 0b000011011,
 			'1': 0b000100111,
 		},
 		"q3": {
@@ -34,7 +34,7 @@ func main() {
 			'1': 0b010000000,
 		},
 		"q6": {
-			'0': 0b100010010,
+			'0': 0b100010011,
 			'1': 0b000110111,
 		},
 		"q7": {
@@ -46,7 +46,7 @@ func main() {
 			'1': 0b100000000,
 		},
 	}
-	startingStates := nfa.StatesBitMap(0b000010011)
+	startingStates := nfa.StatesBitMap(0b000000001)
 	acceptingStates := nfa.StatesBitMap(0b001000100)
 
 	nfa, err := nfa.NewNFA(states, alphabet, delta, startingStates, acceptingStates)
@@ -54,7 +54,6 @@ func main() {
 		fmt.Print(err)
 		return
 	}
-
 	var str string
 
 	fmt.Print("What is your binary string? ")
