@@ -5,7 +5,7 @@ import (
 	"regexp"
 )
 
-type LL1Table map[string]map[string][]string
+type LL1Table map[rune]map[rune][]rune
 
 type RegexReplace struct {
 	Regex       string
@@ -18,26 +18,34 @@ type compiledRegexReplace struct {
 }
 
 type ll1 struct {
-	nonterminalAlphabet []string
-	terminalAlphabet    []string
-	startSymbol         string
+	nonterminalAlphabet []rune
+	terminalAlphabet    []rune
+	startSymbol         rune
 	ll1Table            LL1Table
 	regexesReplaces     []compiledRegexReplace
 }
 
+/*
+  Creates an empty ll1.
+*/
 func initializeLL1() ll1 {
 	return ll1{
-		[]string([]string(nil)),
-		[]string([]string(nil)),
-		string(""),
+		[]rune([]rune(nil)),
+		[]rune([]rune(nil)),
+		rune(' '),
 		LL1Table(LL1Table(nil)),
 		[]compiledRegexReplace([]compiledRegexReplace(nil)),
 	}
 }
 
-func NewLL1(nonterminalAlphabet []string, terminalAlphabet []string, startSymbol string, ll1Table LL1Table, regexesReplaces []RegexReplace) (ll1, error) {
+/*
+  Creates a ll1 and validates it.
+  If the ll1 fails validation, then an empty ll1 is returned.
+*/
+func NewLL1(nonterminalAlphabet []rune, terminalAlphabet []rune, startSymbol rune, ll1Table LL1Table, regexesReplaces []RegexReplace) (ll1, error) {
 	var compiledRegexesReplaces []compiledRegexReplace
 
+	// Compiles the given regexes
 	for _, regexReplace := range regexesReplaces {
 		compiledRegex, err := regexp.Compile(regexReplace.Regex)
 		if err != nil {
@@ -57,6 +65,9 @@ func NewLL1(nonterminalAlphabet []string, terminalAlphabet []string, startSymbol
 	return ll1, nil
 }
 
+/*
+  Validates and solves a ll1 given a string.
+*/
 func (ll1 *ll1) Solve(str string) error {
 	err := ll1.validate()
 	if err != nil {
@@ -67,16 +78,16 @@ func (ll1 *ll1) Solve(str string) error {
 		str = regexReplace.regex.ReplaceAllString(str, regexReplace.replacement)
 	}
 
-	stack := []string{ll1.startSymbol}
+	stack := []rune{ll1.startSymbol}
 
 	for i, char := range str {
-		err := ll1.checkChar(string(char))
+		err := ll1.validateChar(char)
 		if err != nil {
 			return err
 		}
 
-		for len(stack) != 0 && string(char) != stack[0] {
-			if pushString, ok := ll1.ll1Table[stack[0]][string(char)]; ok {
+		for len(stack) != 0 && char != stack[0] {
+			if pushString, ok := ll1.ll1Table[stack[0]][char]; ok {
 				stack = stack[1:]
 				stack = append(pushString, stack...)
 			} else {
@@ -84,7 +95,7 @@ func (ll1 *ll1) Solve(str string) error {
 			}
 		}
 
-		if len(stack) != 0 && string(char) == stack[0] {
+		if len(stack) != 0 && char == stack[0] {
 			stack = stack[1:]
 		}
 
@@ -96,18 +107,11 @@ func (ll1 *ll1) Solve(str string) error {
 	return nil
 }
 
+/*
+	Validates the ll1.
+*/
 func (ll1 *ll1) validate() error {
-	err := checkNonterminalAlphabet(ll1.nonterminalAlphabet)
-	if err != nil {
-		return err
-	}
-
-	err = checkTerminalAlphabet(ll1.terminalAlphabet)
-	if err != nil {
-		return err
-	}
-
-	err = checkStartSymbol(ll1.startSymbol, ll1.nonterminalAlphabet)
+	err := validateStartSymbol(ll1.startSymbol, ll1.nonterminalAlphabet)
 	if err != nil {
 		return err
 	}
@@ -115,9 +119,12 @@ func (ll1 *ll1) validate() error {
 	return nil
 }
 
-func (ll1 *ll1) checkChar(char string) error {
+/*
+	Validates a given character against the ll1's terminal alphabet.
+*/
+func (ll1 *ll1) validateChar(char rune) error {
 	for _, terminalChar := range ll1.terminalAlphabet {
-		if char == string(terminalChar) {
+		if char == terminalChar {
 			return nil
 		}
 	}
@@ -125,27 +132,10 @@ func (ll1 *ll1) checkChar(char string) error {
 	return fmt.Errorf("character '%v' is not a terminal character", char)
 }
 
-func checkTerminalAlphabet(terminalAlphabet []string) error {
-	for _, terminal := range terminalAlphabet {
-		if len([]rune(terminal)) != 1 {
-			return fmt.Errorf("the terminal character '%v' is more than one character", terminal)
-		}
-	}
-
-	return nil
-}
-
-func checkNonterminalAlphabet(nonterminalAlphabet []string) error {
-	for _, nonterminal := range nonterminalAlphabet {
-		if len([]rune(nonterminal)) != 1 {
-			return fmt.Errorf("the terminal character '%v' is more than one character", nonterminal)
-		}
-	}
-
-	return nil
-}
-
-func checkStartSymbol(startSymbol string, nonterminalAlphabet []string) error {
+/*
+	Validates the ll1's starting symbol against the ll1's nonterminal alphabet.
+*/
+func validateStartSymbol(startSymbol rune, nonterminalAlphabet []rune) error {
 	for _, nonterminal := range nonterminalAlphabet {
 		if startSymbol == nonterminal {
 			return nil
